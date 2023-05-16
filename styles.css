@@ -1,0 +1,113 @@
+@font-face {
+    font-family: "Obitron-Bold";
+    src: url('fonts/Orbitron\ Bold.otf');
+}
+
+* {
+    font-family: "Obitron-Bold";
+    margin: 0;
+}
+
+html {
+    background-color: #FEFFFF;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 1fr 1fr 4fr;
+    height: 100vh;
+    width: 100vw;
+}
+
+p {
+    font-size: 2.5rem;
+}
+
+.player-options-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    background-color: #3AAFA9;
+    font-size: 2.5rem;
+}
+
+.winner-container {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+}
+
+.tic-tac-toe-container {
+    display: grid;
+    width: 75%;
+    height: 75%;
+    justify-self: center;
+    grid-template-rows: 1fr 5fr 1fr;
+}
+
+.players {
+    justify-self: center;
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    padding: 10px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    padding-bottom: 10px;
+}
+
+button {
+    background-color: #DEF2F1;
+    border: 2px solid #3AAFA9;
+    border-radius: 7px;
+    transition: border-color 0.5s ease-in-out;
+}
+
+button:hover {
+    border: 4px solid #2B7A78;
+}
+
+
+#reset {
+    display: flex;
+    transition: all 0.5s;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #reset span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+  }
+  
+  #reset span:after {
+    content: '>>>';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+  }
+  
+  #reset:hover span {
+    padding-right: 25px;
+  }
+  
+  #reset:hover span:after {
+    opacity: 1;
+    right: 0;
+  }

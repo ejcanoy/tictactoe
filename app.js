@@ -1,137 +1,173 @@
-let blankBoard = new Array(3);
+const player = (name, type, icon) => {
+  const name1 = name;
+  const type1 = type;
+  const icon1 = icon;
 
-for(let i = 0; i < blankBoard.length; i++){
-    blankBoard[i] = new Array(3);
-    for (j = 0; i < blankBoard[i].length; i++) {
-        blankBoard[i][j] = "";
+  return {
+    name1,
+    type1,
+    icon1,
+  };
+};
+
+const gameBoard = (() => {
+  let board = new Array(9);
+
+  const canPlace = (location) => board[location] === undefined;
+
+  const addXorO = (type, location) => {
+    if (canPlace(location)) {
+      board[location] = type;
+      return true;
     }
-}
+    return false;
+  };
 
-
-blankPlayer = player( "", "", "");
-
-const player = ( name, type, icon) => {
-    const name = name;
-    const type = type;
-    const icon = icon;
-
-    return {
-        name,
-        type,
-        icon
+  const resetBoard = () => {
+    for (let i = 0; i < board.length; i++) {
+      board[i] = undefined;
     }
-}
+  };
+
+  return {
+    board,
+    addXorO,
+    resetBoard,
+  };
+})();
 
 const initialNumTurns = 0;
 
-const gameBoard = (() => {
-    const board = blankBoard;
-
-    const canPlace = (location) => {
-        return board[location[0], location[1]] === "";
-    }
-
-    const addXorO = (type, location) => {
-        if (canPlace(location)) {
-            board[location[0], location[1]] = type;
-            return true;
-        }
-        return false;
-    }
-
-    const resetBoard = () => {
-        board = blankBoard;
-    }
-
-    return {
-        board,
-        addXorO,
-        resetBoard
-    }
-})()
-
-
 const gameController = (() => {
-    let curBoard;
-    let player1;
-    let player2;
-    let numberOfPlays;
+  const curBoard = gameBoard;
+  let player1 = player("player 1", "player", "X");
+  let player2 = player("player 2", "player", "O");
+  let numberOfPlays = initialNumTurns;
+  let gameResult;
 
-    const startGame = () => {
-        numberOfPlays = 0;
-        player1 = player("player 1", "player", "X");
-        player2 = player("player 2", "player", "O");
-        curBoard = gameBoard();
+  const startGame = () => {
+    numberOfPlays = initialNumTurns;
+    player1 = player("player 1", "player", "X");
+    player2 = player("player 2", "player", "O");
+    curBoard.resetBoard();
+  };
+
+  const getActivePlayer = () => {
+    if (numberOfPlays % 2 === 0) {
+      return player1;
+    }
+    return player2;
+  };
+
+  const getGameResult = () => gameResult;
+
+  const calculateWinner = () => {
+    const winner = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    for (let i = 0; i < winner.length; i++) {
+      const [a, b, c] = winner[i];
+      if (
+        curBoard.board[a]
+        && curBoard.board[a] === curBoard.board[b]
+        && curBoard.board[a] === curBoard.board[c]
+      ) {
+        return curBoard.board[a];
+      }
     }
 
-    const playRound = (location) => {
-        if (isGameOver()) return;
-        const icon = (getActivePlayer()).icon;
-        curBoard.addXorO(icon);
+    return null;
+  };
+
+  const calculateTie = () => {
+    console.log()
+    for (let i = 0; i < curBoard.board.length; i++) {
+      if (!curBoard.board[i]) return false;
+    }
+    return curBoard.board.length === numberOfPlays;
+  };
+
+  const playRound = (location) => {
+    if (gameResult) {
+      return gameResult;
+    }
+    const { icon1 } = getActivePlayer();
+
+    const placementResult = curBoard.addXorO(icon1, location);
+    if (placementResult) {
+      numberOfPlays++;
+      console.log(curBoard);
+      if (calculateTie()) {
+        gameResult = "Tie";
+      } else if (calculateWinner()) {
+        gameResult = calculateWinner();
+      }
     }
 
-    getActivePlayer = () => {
-        if (numberOfPlays % 2) {
-            return player1;
-        } else {
-            return player2;
-        }
+    return placementResult;
+  };
+
+  return {
+    startGame,
+    getActivePlayer,
+    getGameResult,
+    playRound,
+    curBoard,
+  };
+})();
+
+const displayController = (() => {
+  let curGame = gameController;
+  const squares = document.getElementsByClassName("tic-tac-square");
+  const squaresArray = Array.from(squares);
+
+  const resetBtn = document.getElementById("reset");
+
+  const winnerTitle = document.getElementById("winner-title");
+
+  const displayResult = (result) => {
+    if (result === 'Tie') {
+      winnerTitle.innerHTML = `The Game is a ${result}`;
+    } else {
+      winnerTitle.innerHTML = `The Winner is ${result}`;
     }
+  };
 
-    const isGameOver = () => {
-        return (calculateWinner() || calculateTie());
+  const setSquare = (button) => {
+    const location = button.id.charAt(button.id.length - 1);
+    const curIcon = curGame.getActivePlayer().icon1;
+    const result = curGame.playRound(location);
+    if (curGame.getGameResult() && !result) {
+      alert(`The winner is ${curGame.getGameResult()}`);
+    } else if (!result) {
+      alert("Can't place icon there");
+    } else if (curGame.getGameResult() && result) {
+      displayResult(curGame.getGameResult());
+      button.innerText = curIcon;
+    } else if (result) {
+      button.innerText = curIcon;
     }
+  };
 
-    const calculateWinner = () => {
-        const winner = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ]
+  const resetDisplay = () => {
+    curGame.startGame();
+    winnerTitle.innerHTML = "";
+    squaresArray.forEach((button) => {
+      button.innerHTML = "";
+    });
+  };
 
-        for (let i = 0; i < winner.length; i++) {
-            const [a, b, c] = lines[i];
-            if (curBoard[a] && curBoard[a] === curBoard[b] && curBoard[a] === curBoard[c]) {
-                return curBoard[a];
-            }
-        }
+  squaresArray.forEach((button) => {
+    button.addEventListener("click", () => setSquare(button));
+  });
 
-        return null;
-    }
-
-    const calculateTie = () => {
-        for (let i = 0; i < curBoard.length; i++) {
-            if (curBoard[i] === "") return null;
-        }
-        return true;
-    }
-
-    return {
-        startGame,
-        playRound,
-    }
-
-
-})()
-
-
-// const displayController = (() => {
-    
-//     // displayBoard
-
-//     // displayActivePlayer
-
-//     const handleClick = () => {
-//         // if there is something there or isWinner?
-//     }
-
-// })()
-
-
-
-
+  resetBtn.addEventListener("click", () => resetDisplay());
+})();
