@@ -50,6 +50,7 @@ const gameController = (() => {
     player1 = player("player 1", "player", "X");
     player2 = player("player 2", "player", "O");
     curBoard.resetBoard();
+    gameResult = undefined;
   };
 
   const getActivePlayer = () => {
@@ -88,7 +89,6 @@ const gameController = (() => {
   };
 
   const calculateTie = () => {
-    console.log()
     for (let i = 0; i < curBoard.board.length; i++) {
       if (!curBoard.board[i]) return false;
     }
@@ -125,7 +125,7 @@ const gameController = (() => {
 })();
 
 const displayController = (() => {
-  let curGame = gameController;
+  const curGame = gameController;
   const squares = document.getElementsByClassName("tic-tac-square");
   const squaresArray = Array.from(squares);
 
