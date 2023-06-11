@@ -40,15 +40,15 @@ const initialNumTurns = 0;
 
 const gameController = (() => {
   const curBoard = gameBoard;
-  let player1 = player("player 1", "player", "X");
-  let player2 = player("player 2", "player", "O");
+  let player1 = player("Player 1", "player", "X");
+  let player2 = player("Player 2", "player", "O");
   let numberOfPlays = initialNumTurns;
   let gameResult;
 
   const startGame = () => {
     numberOfPlays = initialNumTurns;
-    player1 = player("player 1", "player", "X");
-    player2 = player("player 2", "player", "O");
+    player1 = player("Player 1", "player", "X");
+    player2 = player("Player 2", "player", "O");
     curBoard.resetBoard();
     gameResult = undefined;
   };
@@ -77,9 +77,9 @@ const gameController = (() => {
     for (let i = 0; i < winner.length; i++) {
       const [a, b, c] = winner[i];
       if (
-        curBoard.board[a]
-        && curBoard.board[a] === curBoard.board[b]
-        && curBoard.board[a] === curBoard.board[c]
+        curBoard.board[a] &&
+        curBoard.board[a] === curBoard.board[b] &&
+        curBoard.board[a] === curBoard.board[c]
       ) {
         return curBoard.board[a];
       }
@@ -104,7 +104,6 @@ const gameController = (() => {
     const placementResult = curBoard.addXorO(icon1, location);
     if (placementResult) {
       numberOfPlays++;
-      console.log(curBoard);
       if (calculateTie()) {
         gameResult = "Tie";
       } else if (calculateWinner()) {
@@ -128,46 +127,49 @@ const displayController = (() => {
   const curGame = gameController;
   const squares = document.getElementsByClassName("tic-tac-square");
   const squaresArray = Array.from(squares);
-
   const resetBtn = document.getElementById("reset");
-
   const winnerTitle = document.getElementById("winner-title");
+  const playerTurn = document.getElementById("turn-title");
 
-  const displayResult = (result) => {
-    if (result === 'Tie') {
-      winnerTitle.innerHTML = `The Game is a ${result}`;
+  const updateScreen = () => {
+    if (curGame.getGameResult() === "X" || curGame.getGameResult() === "O") {
+      winnerTitle.innerHTML = `The Winner is a ${curGame.getGameResult()}`;
+      playerTurn.innerText = '';
+    } else if (curGame.getGameResult() === "Tie") {
+      winnerTitle.innerHTML = `The Game is a ${curGame.getGameResult()}`;
+      playerTurn.innerText = '';
     } else {
-      winnerTitle.innerHTML = `The Winner is ${result}`;
+      playerTurn.innerText = `${curGame.getActivePlayer().name1} - ${
+        curGame.getActivePlayer().icon1
+      } turn`;
+    }
+    console.log(gameController.curBoard.board.length);
+    for (let i = 0; i < gameController.curBoard.board.length; i++) {
+      if (gameController.curBoard.board[i] === undefined) {
+        squaresArray[i].innerText = "";
+      } else {
+        squaresArray[i].innerText = gameController.curBoard.board[i];
+      }
     }
   };
 
-  const setSquare = (button) => {
-    const location = button.id.charAt(button.id.length - 1);
-    const curIcon = curGame.getActivePlayer().icon1;
-    const result = curGame.playRound(location);
-    if (curGame.getGameResult() && !result) {
-      alert(`The winner is ${curGame.getGameResult()}`);
-    } else if (!result) {
-      alert("Can't place icon there");
-    } else if (curGame.getGameResult() && result) {
-      displayResult(curGame.getGameResult());
-      button.innerText = curIcon;
-    } else if (result) {
-      button.innerText = curIcon;
+  const handleClick = (button) => {
+    if (button) {
+      const location = button.id.charAt(button.id.length - 1);
+      const result = curGame.playRound(location);
+      if (!result) {
+        alert("Can't place icon there");
+      }
+    } else {
+      curGame.startGame();
     }
-  };
-
-  const resetDisplay = () => {
-    curGame.startGame();
-    winnerTitle.innerHTML = "";
-    squaresArray.forEach((button) => {
-      button.innerHTML = "";
-    });
+    updateScreen();
   };
 
   squaresArray.forEach((button) => {
-    button.addEventListener("click", () => setSquare(button));
+    button.addEventListener("click", () => handleClick(button));
   });
 
-  resetBtn.addEventListener("click", () => resetDisplay());
+  resetBtn.addEventListener("click", () => handleClick(undefined));
+  updateScreen();
 })();

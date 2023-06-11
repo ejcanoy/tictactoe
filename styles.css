@@ -42,7 +42,7 @@ header {
     font-size: 2.5rem;
 }
 
-.winner-container {
+.winner-container, .turn-container  {
     display: flex;
     justify-content: center;
     padding-top: 20px;
@@ -60,7 +60,7 @@ header {
     justify-self: center;
     display: flex;
     justify-content: space-between;
-    width: 50%;
+    width: 100%;
     padding: 10px;
 }
 
